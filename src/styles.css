@@ -308,7 +308,7 @@ button {
   justify-self: start;
 }
 .map-count {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: bold;
 }
 .map-row-locked .map-count,

@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef } from 'react'
 import { formatTime } from '../scoring'
-import { STAGES, UNLOCK_RANK, getStageStatuses, stageLabel } from '../stages'
+import { STAGES, UNLOCK_RANK, getStageStatuses, levelLabel, stageDetail, stageLabel } from '../stages'
 import { getBestRecord } from '../storage'
 import { Stamp } from './Stamp'
 
@@ -34,6 +34,9 @@ export function Home({ onStart, onOpenStamps }: Props) {
           <span>
             {clearedCount}/{STAGES.length} クリア
           </span>
+          <button className="btn btn-small" onClick={() => onOpenStamps((current ?? STAGES[0]).level.id)}>
+            スタンプ
+          </button>
         </div>
       </header>
 
@@ -43,9 +46,7 @@ export function Home({ onStart, onOpenStamps }: Props) {
             <div className="next-card-label">つぎは これ!</div>
             <div className="next-card-title">
               {stageLabel(current)}
-              <small>
-                {current.level.name}・{current.count}もん
-              </small>
+              <small>{stageDetail(current)}</small>
             </div>
             <div className="next-card-desc">{current.level.description}</div>
             <button className="btn btn-primary btn-big" onClick={() => onStart(current.id)}>
@@ -62,7 +63,7 @@ export function Home({ onStart, onOpenStamps }: Props) {
         {STAGES.map((stage, i) => {
           const status = statuses[i]
           const best = getBestRecord(stage.id)
-          const isLevelStart = i === 0 || STAGES[i - 1].level.id !== stage.level.id
+          const isLevelStart = i === 0 || STAGES[i - 1].count !== stage.count
           const reached = status !== 'locked'
           const nextReached = i < STAGES.length - 1 && statuses[i + 1] !== 'locked'
           return (
@@ -72,12 +73,9 @@ export function Home({ onStart, onOpenStamps }: Props) {
                   {i > 0 && <div className={`map-path map-path-full ${reached ? 'map-path-done' : ''}`} />}
                   <div className="map-level">
                     <div>
-                      <div className="map-level-name">{stage.level.name}</div>
-                      <div className="map-level-desc">{stage.level.description}</div>
+                      <div className="map-level-name">{levelLabel(stage.count)}</div>
+                      <div className="map-level-desc">{stage.count}もん</div>
                     </div>
-                    <button className="btn btn-small" onClick={() => onOpenStamps(stage.level.id)}>
-                      スタンプ
-                    </button>
                   </div>
                 </div>
               )}
@@ -96,12 +94,12 @@ export function Home({ onStart, onOpenStamps }: Props) {
                   className="map-node"
                   disabled={status === 'locked'}
                   onClick={() => onStart(stage.id)}
-                  aria-label={`${stageLabel(stage)} ${stage.count}もん`}
+                  aria-label={`${stageLabel(stage)} ${stageDetail(stage)}`}
                 >
                   {status === 'locked' ? '🔒' : status === 'cleared' ? '★' : stage.index + 1}
                 </button>
                 <div className="map-info">
-                  <div className="map-count">{stage.count}もん</div>
+                  <div className="map-count">{stage.level.name}</div>
                   <div className="map-status">
                     {status === 'current' && <span className="map-here">つぎは ここ!</span>}
                     {status === 'cleared' && best && `ベスト ${formatTime(best.timeMs)}`}

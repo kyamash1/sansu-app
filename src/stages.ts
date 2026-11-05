@@ -10,13 +10,13 @@ export type Stage = {
   count: number
 }
 
-/** 各レベルの中で、この問題数の順にステップアップする */
+/** 問題数ごとにレベルをわけ、各レベルの中で LEVELS の順にステップアップする */
 export const STAGE_COUNTS = [30, 50, 70, 100]
 
 /** このランク以上でクリアすると次のステージがひらく */
 export const UNLOCK_RANK: Rank = 'B'
 
-export const STAGES: Stage[] = LEVELS.flatMap((level) => STAGE_COUNTS.map((count) => ({ level, count }))).map(
+export const STAGES: Stage[] = STAGE_COUNTS.flatMap((count) => LEVELS.map((level) => ({ level, count }))).map(
   (s, index) => ({ ...s, id: `${s.level.id}-${s.count}`, index }),
 )
 
@@ -26,6 +26,14 @@ export function findStage(id: string): Stage | undefined {
 
 export function stageLabel(stage: Stage) {
   return `ステージ${stage.index + 1}`
+}
+
+export function levelLabel(count: number) {
+  return `レベル${STAGE_COUNTS.indexOf(count) + 1}`
+}
+
+export function stageDetail(stage: Stage) {
+  return `${levelLabel(stage.count)}(${stage.count}もん)・${stage.level.name}`
 }
 
 export function meetsUnlockRank(rank: Rank) {

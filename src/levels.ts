@@ -29,21 +29,21 @@ function pairsWhere(pred: (a: number, b: number) => boolean): [number, number][]
 export const LEVELS: Level[] = [
   {
     id: 'lv1',
-    name: 'レベル1',
+    name: 'こたえ 5まで',
     description: 'こたえが 5までの たしざん',
     targetSecPerProblem: 2.0,
     pairs: pairsWhere((a, b) => a + b <= 5),
   },
   {
     id: 'lv2',
-    name: 'レベル2',
+    name: 'こたえ 10になる',
     description: 'こたえが 10になる たしざん',
     targetSecPerProblem: 2.5,
     pairs: pairsWhere((a, b) => a + b === 10),
   },
   {
     id: 'lv3',
-    name: 'レベル3',
+    name: 'こたえ 10まで',
     description: 'こたえが 10までの たしざん',
     targetSecPerProblem: 3.0,
     pairs: pairsWhere((a, b) => a + b <= 10),

@@ -1,5 +1,5 @@
 import { calcScore, formatTime, isBetterRank } from '../scoring'
-import { UNLOCK_RANK, getCurrentStage, stageLabel, type Stage } from '../stages'
+import { UNLOCK_RANK, getCurrentStage, stageDetail, stageLabel, type Stage } from '../stages'
 import type { PlayRecord } from '../storage'
 import type { AnswerLog } from './Play'
 import { Stamp } from './Stamp'
@@ -48,7 +48,7 @@ export function Result({
   return (
     <div className="screen result">
       <div className="result-level">
-        {stageLabel(stage)}({level.name}・{stage.count}もん)おわり!
+        {stageLabel(stage)}({stageDetail(stage)})おわり!
       </div>
 
       <div className="result-stamp">
@@ -60,9 +60,7 @@ export function Result({
       {unlockedNext && current && (
         <div className="next-banner next-banner-open">
           🎉 {stageLabel(current)}が ひらいたよ!
-          <small>
-            {current.level.name}・{current.count}もん
-          </small>
+          <small>{stageDetail(current)}</small>
         </div>
       )}
       {mustRetry && (

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { generateProblems, type Problem } from '../levels'
 import { formatClock } from '../scoring'
 import { playCorrect, playWrong, unlockAudio } from '../sound'
-import { stageLabel, type Stage } from '../stages'
+import { stageDetail, stageLabel, type Stage } from '../stages'
 
 export type AnswerLog = {
   problem: Problem
@@ -181,7 +181,7 @@ export function Play({ stage, onFinish, onQuit }: Props) {
           やめる
         </button>
         <div className="play-level">
-          {stageLabel(stage)} <small>{stage.level.name}・{stage.count}もん</small>
+          {stageLabel(stage)} <small>{stageDetail(stage)}</small>
         </div>
         <div className="play-stats">
           <span className="play-clock">⏱ {formatClock(elapsed)}</span>
