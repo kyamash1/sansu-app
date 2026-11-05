@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { generateProblems, type Problem } from '../levels'
 import { formatClock } from '../scoring'
+import { playCorrect, playWrong, unlockAudio } from '../sound'
 import { stageLabel, type Stage } from '../stages'
 
 export type AnswerLog = {
@@ -108,7 +109,17 @@ export function Play({ stage, onFinish, onQuit }: Props) {
     onFinish(answers, finishedAt - startedAt)
   }, [finishedAt, startedAt, answers, onFinish])
 
-  const press = useCallback((key: string) => dispatch({ type: 'key', key, now: performance.now() }), [])
+  useEffect(() => {
+    const last = answers[answers.length - 1]
+    if (!last) return
+    if (last.correct) playCorrect()
+    else playWrong()
+  }, [answers])
+
+  const press = useCallback((key: string) => {
+    unlockAudio()
+    dispatch({ type: 'key', key, now: performance.now() })
+  }, [])
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
