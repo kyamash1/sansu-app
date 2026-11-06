@@ -88,7 +88,9 @@ export function Home({ onStart, onOpenStamps }: Props) {
                   <div className={`map-path map-path-bottom ${nextReached ? 'map-path-done' : ''}`} />
                 )}
                 <div className="map-best">
-                  {best && <Stamp rank={best.rank} size={44} label={formatTime(best.timeMs)} />}
+                  {best && (
+                    <Stamp rank={best.rank} size={80} label={formatTime(best.timeMs)} animal={stage.animal} />
+                  )}
                 </div>
                 <button
                   className="map-node"

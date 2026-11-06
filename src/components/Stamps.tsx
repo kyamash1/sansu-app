@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { LEVELS, findLevel } from '../levels'
 import { RANKS, formatTime, rankCriteria } from '../scoring'
-import { UNLOCK_RANK } from '../stages'
-import { clearRecords, countStamps, getRecords } from '../storage'
+import { STAGES, UNLOCK_RANK, findStage, stageLabel } from '../stages'
+import { clearRecords, countStamps, getBestRecord, getRecords } from '../storage'
 import { Stamp } from './Stamp'
 
 type Props = {
@@ -45,6 +45,28 @@ export function Stamps({ initialLevelId, onBack }: Props) {
         <span />
       </header>
 
+      <section className="zukan">
+        <div className="zukan-title">さいきょう ずかん</div>
+        <div className="zukan-grid">
+          {STAGES.map((stage) => {
+            const best = getBestRecord(stage.id)
+            return (
+              <div key={stage.id} className="zukan-item">
+                {best ? (
+                  <Stamp rank={best.rank} size={72} animal={stage.animal} label={formatTime(best.timeMs)} />
+                ) : (
+                  <div className="zukan-unknown">
+                    <img src={stage.animal.image} alt="" draggable={false} />
+                    <span>?</span>
+                  </div>
+                )}
+                <span className="zukan-name">{best ? stage.animal.name : stageLabel(stage)}</span>
+              </div>
+            )
+          })}
+        </div>
+      </section>
+
       <div className="tabs">
         {LEVELS.map((l) => (
           <button
@@ -71,7 +93,12 @@ export function Stamps({ initialLevelId, onBack }: Props) {
           <div key={i} className="stamp-slot">
             {rec ? (
               <>
-                <Stamp rank={rec.rank} size={54} label={formatTime(rec.timeMs)} />
+                <Stamp
+                  rank={rec.rank}
+                  size={58}
+                  label={formatTime(rec.timeMs)}
+                  animal={findStage(rec.stageId)?.animal}
+                />
                 <span className="stamp-date">
                   {formatDate(rec.playedAt)}・{rec.total}もん
                 </span>

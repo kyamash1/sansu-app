@@ -132,6 +132,124 @@ button {
   100% { transform: scale(1) rotate(-12deg); opacity: 1; }
 }
 
+/* ---------- どうぶつスタンプ ---------- */
+.animal-stamp {
+  flex: none;
+  position: relative;
+  display: inline-block;
+  vertical-align: middle;
+  container-type: inline-size;
+}
+.animal-stamp img {
+  width: 86%;
+  height: 86%;
+  object-fit: contain;
+  object-position: left top;
+  display: block;
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+}
+.animal-stamp-rank {
+  position: absolute;
+  right: 0;
+  bottom: 2%;
+  font-size: max(11px, 20cqw);
+  width: 1.5em;
+  height: 1.5em;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  line-height: 1;
+  color: #fff;
+  border: 0.12em solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  transform: rotate(-12deg);
+}
+.animal-stamp-S .animal-stamp-rank {
+  background: radial-gradient(circle at 35% 30%, #ffe27a, var(--rank-S));
+  text-shadow: 0 2px 0 #c98c00;
+}
+.animal-stamp-A .animal-stamp-rank { background: var(--rank-A); }
+.animal-stamp-B .animal-stamp-rank { background: var(--rank-B); }
+.animal-stamp-C .animal-stamp-rank { background: var(--rank-C); }
+.animal-stamp-D .animal-stamp-rank { background: var(--rank-D); }
+.animal-stamp-S img {
+  filter: drop-shadow(0 0 4px #ffd23f) drop-shadow(0 0 2px #ffb300);
+  animation: s-glow 1.6s ease-in-out infinite alternate;
+}
+@keyframes s-glow {
+  from { filter: drop-shadow(0 0 2px #ffd23f) drop-shadow(0 0 1px #ffb300); }
+  to { filter: drop-shadow(0 0 8px #ffd23f) drop-shadow(0 0 3px #ffb300); }
+}
+.animal-stamp-pop {
+  animation: animal-stamp-pop 0.6s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+.animal-stamp-pop .animal-stamp-rank {
+  animation: stamp-pop 0.5s 0.45s cubic-bezier(0.2, 1.6, 0.4, 1) both;
+}
+@keyframes animal-stamp-pop {
+  0% { transform: scale(2.5) rotate(-20deg); opacity: 0; }
+  60% { opacity: 1; }
+  100% { transform: scale(1) rotate(-4deg); opacity: 1; }
+}
+
+/* ---------- ずかん ---------- */
+.zukan {
+  background: var(--paper);
+  border-radius: 16px;
+  padding: 12px;
+}
+.zukan-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+.zukan-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px 6px;
+}
+.zukan-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.zukan-item .animal-stamp,
+.zukan-unknown {
+  position: relative;
+  width: min(96px, 100%) !important;
+  height: auto !important;
+  aspect-ratio: 1;
+}
+.zukan-unknown img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: brightness(0) opacity(0.12);
+}
+.zukan-unknown span {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 900;
+  color: #fff;
+}
+.zukan-name {
+  font-size: 10px;
+  color: var(--sub);
+  text-align: center;
+  line-height: 1.2;
+}
+.result-animal {
+  font-weight: bold;
+  font-size: 18px;
+  margin-top: 4px;
+}
+
 /* ---------- ホーム ---------- */
 .home-header {
   text-align: center;
@@ -706,6 +824,11 @@ button {
   justify-content: center;
   gap: 2px;
   position: relative;
+}
+.stamp-slot .animal-stamp {
+  width: 74% !important;
+  height: auto !important;
+  aspect-ratio: 1;
 }
 .stamp-slot-no {
   color: var(--line);

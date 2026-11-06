@@ -2,13 +2,39 @@ import { LEVELS, type Level } from './levels'
 import { RANKS, type Rank } from './scoring'
 import { getRecords } from './storage'
 
+export type StageAnimal = {
+  name: string
+  image: string
+}
+
 export type Stage = {
   id: string
   /** 0 はじまりの通し番号 */
   index: number
   level: Level
   count: number
+  animal: StageAnimal
 }
+
+function animal(name: string, file: string): StageAnimal {
+  return { name, image: `stamps/${file}.webp` }
+}
+
+/** ステージ1から順に、そのステージのスタンプになる動物 */
+const STAGE_ANIMALS: StageAnimal[] = [
+  animal('ティラノサウルス', 'trex'),
+  animal('トリケラトプス', 'triceratops'),
+  animal('スピノサウルス', 'spinosaurus'),
+  animal('マンモス', 'mammoth'),
+  animal('ヘラクレスオオカブト', 'hercules'),
+  animal('ギラファノコギリクワガタ', 'giraffa'),
+  animal('ライオン', 'lion'),
+  animal('ゴリラ', 'gorilla'),
+  animal('ホホジロザメ', 'shark'),
+  animal('イリエワニ', 'crocodile'),
+  animal('オオアナコンダ', 'anaconda'),
+  animal('アフリカゾウ', 'elephant'),
+]
 
 /** 問題数ごとにレベルをわけ、各レベルの中で LEVELS の順にステップアップする */
 export const STAGE_COUNTS = [30, 50, 70, 100]
@@ -17,7 +43,12 @@ export const STAGE_COUNTS = [30, 50, 70, 100]
 export const UNLOCK_RANK: Rank = 'B'
 
 export const STAGES: Stage[] = STAGE_COUNTS.flatMap((count) => LEVELS.map((level) => ({ level, count }))).map(
-  (s, index) => ({ ...s, id: `${s.level.id}-${s.count}`, index }),
+  (s, index) => ({
+    ...s,
+    id: `${s.level.id}-${s.count}`,
+    index,
+    animal: STAGE_ANIMALS[index % STAGE_ANIMALS.length],
+  }),
 )
 
 export function findStage(id: string): Stage | undefined {

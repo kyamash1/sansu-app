@@ -52,7 +52,8 @@ export function Result({
       </div>
 
       <div className="result-stamp">
-        <Stamp rank={record.rank} size={160} animate />
+        <Stamp rank={record.rank} size={200} animate animal={stage.animal} />
+        <div className="result-animal">{stage.animal.name}の {record.rank}スタンプ!</div>
       </div>
       <div className="result-message">{RANK_MESSAGES[record.rank]}</div>
       {isNewBest && <div className="new-best">★ じこベスト こうしん! ★</div>}
