@@ -70,6 +70,54 @@ function addTriples(maxSum = 20): [number, number, number][] {
   return result
 }
 
+const TWO_DIGIT = Array.from({ length: 90 }, (_, i) => i + 10) // 10〜99
+
+/** やさしい 2けた+1けた（一の位でくりあがらない） */
+function add2digit1digitNoCarry(): [number, number][] {
+  const result: [number, number][] = []
+  for (const a of TWO_DIGIT) {
+    for (const b of DIGITS) {
+      if (a % 10 + b < 10) result.push([a, b])
+    }
+  }
+  return result
+}
+
+/** やさしい 2けた−1けた（一の位でくりさがらない） */
+function sub2digit1digitNoBorrow(): [number, number][] {
+  const result: [number, number][] = []
+  for (const a of TWO_DIGIT) {
+    for (const b of DIGITS) {
+      if (a % 10 >= b) result.push([a, b])
+    }
+  }
+  return result
+}
+
+/** 2けた+2けた（一の位・十の位ともくりあがりなし → こたえ100未満） */
+function add2digit2digitNoCarry(): [number, number][] {
+  const result: [number, number][] = []
+  for (const a of TWO_DIGIT) {
+    for (const b of TWO_DIGIT) {
+      if (a % 10 + (b % 10) < 10 && Math.floor(a / 10) + Math.floor(b / 10) < 10) {
+        result.push([a, b])
+      }
+    }
+  }
+  return result
+}
+
+/** 2けた+2けた（一の位でくりあがりあり） */
+function add2digit2digitCarry(): [number, number][] {
+  const result: [number, number][] = []
+  for (const a of TWO_DIGIT) {
+    for (const b of TWO_DIGIT) {
+      if (a % 10 + (b % 10) >= 10) result.push([a, b])
+    }
+  }
+  return result
+}
+
 export const LEVELS: Level[] = [
   {
     id: 'lv1',
@@ -143,6 +191,38 @@ export const LEVELS: Level[] = [
     operator: '+',
     pairs: [],
     triples: addTriples(20),
+  },
+  {
+    id: 'lv10',
+    name: 'やさしい 2けた+1けた',
+    description: 'くりあがりのない 2けた+1けた',
+    targetSecPerProblem: 4.0,
+    operator: '+',
+    pairs: add2digit1digitNoCarry(),
+  },
+  {
+    id: 'lv11',
+    name: 'やさしい 2けた−1けた',
+    description: 'くりさがりのない 2けた−1けた',
+    targetSecPerProblem: 4.0,
+    operator: '-',
+    pairs: sub2digit1digitNoBorrow(),
+  },
+  {
+    id: 'lv12',
+    name: '2けた+2けた（くりあがりなし）',
+    description: 'くりあがりのない 2けたどうしの たしざん',
+    targetSecPerProblem: 5.0,
+    operator: '+',
+    pairs: add2digit2digitNoCarry(),
+  },
+  {
+    id: 'lv13',
+    name: '2けた+2けた（くりあがりあり）',
+    description: 'くりあがりのある 2けたどうしの たしざん',
+    targetSecPerProblem: 6.0,
+    operator: '+',
+    pairs: add2digit2digitCarry(),
   },
 ]
 

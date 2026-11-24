@@ -20,7 +20,7 @@ type Props = {
 const ROW_HEIGHT = 104
 const ROWS_BEFORE = 5
 const ROWS_AFTER = 5
-const MAX_INPUT_LENGTH = 2
+const MAX_INPUT_LENGTH = 3
 
 type PlayState = {
   problems: Problem[]
@@ -148,7 +148,11 @@ export function Play({ stage, onFinish, onQuit }: Props) {
         style={{ top: i * ROW_HEIGHT, height: ROW_HEIGHT }}
       >
         <span className="row-no">({i + 1})</span>
-        <span className={`row-expr ${p.c != null ? 'row-expr-wide' : ''}`}>
+        <span
+          className={`row-expr ${
+            p.c != null || p.a >= 10 || p.b >= 10 ? 'row-expr-wide' : ''
+          }`}
+        >
           {formatProblem(p)} =
         </span>
         <span className={`row-answer ${isCurrent ? 'row-answer-active' : ''}`}>
