@@ -61,13 +61,15 @@ export function Result({
 
       {unlockedNext && current && (
         <div className="next-banner next-banner-open">
-          🎉 {stageLabel(current)}が ひらいたよ!
-          <small>{stageDetail(current)}</small>
+          🎉 つぎが ひらいたよ!
+          <small>
+            {stageLabel(current)}・{stageDetail(current)}
+          </small>
         </div>
       )}
       {mustRetry && (
         <div className="next-banner next-banner-retry">
-          {UNLOCK_RANK}いじょう で つぎの ステージに すすめるよ!
+          {UNLOCK_RANK}いじょう で つぎに すすめるよ!
           <small>もういちど チャレンジしてみよう</small>
         </div>
       )}
@@ -77,7 +79,7 @@ export function Result({
         {goNext ? (
           <>
             <button className="btn btn-primary btn-big" onClick={() => onPlay(goNext.id)}>
-              つぎへ すすむ ▶ {stageLabel(goNext)}
+              つぎへ すすむ ▶ {stageDetail(goNext)}
             </button>
             <button className="btn btn-sub" onClick={() => onPlay(stage.id)}>
               もういちど

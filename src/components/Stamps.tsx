@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { LEVELS, findLevel } from '../levels'
 import { RANKS, formatTime, rankCriteria } from '../scoring'
-import { STAGES, UNLOCK_RANK, findStage, stageLabel } from '../stages'
+import { STAGES, UNLOCK_RANK, findStage, stageDetail } from '../stages'
 import { clearRecords, countStamps, getBestRecord, getRecords } from '../storage'
 import { Stamp } from './Stamp'
 
@@ -60,7 +60,7 @@ export function Stamps({ initialLevelId, onBack }: Props) {
                     <span>?</span>
                   </div>
                 )}
-                <span className="zukan-name">{best ? stage.animal.name : stageLabel(stage)}</span>
+                <span className="zukan-name">{best ? stage.animal.name : stageDetail(stage)}</span>
               </div>
             )
           })}
@@ -114,8 +114,8 @@ export function Stamps({ initialLevelId, onBack }: Props) {
         <summary>ランクの きじゅん(おうちの かたへ)</summary>
         <p>
           正答率とタイムをそれぞれ評価し、低いほうのランクになります。
-          レベル1〜4 はそれぞれ 30・50・70・100問 で、各レベルの中で問題の種類ごとにステージが進みます。
-          {UNLOCK_RANK} 以上でクリアすると次のステージが解放されます。
+          ステージは大きなテーマごとに分かれ、その中で問題の種類と問題数（30・50・70・100問）が進みます。
+          {UNLOCK_RANK} 以上でクリアすると次が解放されます。
         </p>
         <table>
           <thead>

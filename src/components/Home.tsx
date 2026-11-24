@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef } from 'react'
 import { formatTime } from '../scoring'
-import { STAGES, UNLOCK_RANK, getStageStatuses, levelLabel, stageDetail, stageLabel } from '../stages'
+import { STAGES, UNLOCK_RANK, getStageStatuses, stageDetail, stageLabel, themeLabel } from '../stages'
 import { getBestRecord } from '../storage'
 import { Stamp } from './Stamp'
 
@@ -63,18 +63,18 @@ export function Home({ onStart, onOpenStamps }: Props) {
         {STAGES.map((stage, i) => {
           const status = statuses[i]
           const best = getBestRecord(stage.id)
-          const isLevelStart = i === 0 || STAGES[i - 1].count !== stage.count
+          const isThemeStart = i === 0 || STAGES[i - 1].theme.id !== stage.theme.id
           const reached = status !== 'locked'
           const nextReached = i < STAGES.length - 1 && statuses[i + 1] !== 'locked'
           return (
             <Fragment key={stage.id}>
-              {isLevelStart && (
+              {isThemeStart && (
                 <div className="map-level-wrap">
                   {i > 0 && <div className={`map-path map-path-full ${reached ? 'map-path-done' : ''}`} />}
                   <div className="map-level">
                     <div>
-                      <div className="map-level-name">{levelLabel(stage.count)}</div>
-                      <div className="map-level-desc">{stage.count}もん</div>
+                      <div className="map-level-name">{themeLabel(stage.theme)}</div>
+                      <div className="map-level-desc">{stage.theme.name}</div>
                     </div>
                   </div>
                 </div>
@@ -101,7 +101,10 @@ export function Home({ onStart, onOpenStamps }: Props) {
                   {status === 'locked' ? '🔒' : status === 'cleared' ? '★' : stage.index + 1}
                 </button>
                 <div className="map-info">
-                  <div className="map-count">{stage.level.name}</div>
+                  <div className="map-count">
+                    {stage.level.name}
+                    <small> {stage.count}もん</small>
+                  </div>
                   <div className="map-status">
                     {status === 'current' && <span className="map-here">つぎは ここ!</span>}
                     {status === 'cleared' && best && `ベスト ${formatTime(best.timeMs)}`}

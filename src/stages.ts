@@ -1,4 +1,4 @@
-import { LEVELS, type Level } from './levels'
+import { findLevel, type Level } from './levels'
 import { RANKS, type Rank } from './scoring'
 import { getRecords } from './storage'
 
@@ -7,14 +7,88 @@ export type StageAnimal = {
   image: string
 }
 
+/** 大きなテーマ（マップ上の「ステージ」区切り） */
+export type Theme = {
+  id: string
+  /** 1 はじまりの表示番号 */
+  number: number
+  name: string
+  description: string
+  levelIds: string[]
+}
+
 export type Stage = {
   id: string
   /** 0 はじまりの通し番号 */
   index: number
+  theme: Theme
   level: Level
   count: number
   animal: StageAnimal
 }
+
+/**
+ * 初期実装の「こたえ5まで〜10まで × 問題数」をステージ1とし、
+ * 以降も同じ粒度の大きなテーマでまとめる
+ */
+export const THEMES: Theme[] = [
+  {
+    id: 'add-basic',
+    number: 1,
+    name: 'たしざん（5〜10）',
+    description: 'こたえが 5まで・10になる・10までの たしざん',
+    levelIds: ['lv1', 'lv2', 'lv3'],
+  },
+  {
+    id: 'add-carry',
+    number: 2,
+    name: 'くりあがり たしざん',
+    description: 'くりあがりと たしざん ぜんぶ',
+    levelIds: ['lv4', 'lv5'],
+  },
+  {
+    id: 'sub-basic',
+    number: 3,
+    name: 'ひきざん',
+    description: 'くりさがりなし・あり・ひきざんぜんぶ',
+    levelIds: ['lv6', 'lv7', 'lv8'],
+  },
+  {
+    id: 'add-triple',
+    number: 4,
+    name: '3つのかずの たしざん',
+    description: '3つの かずを たす',
+    levelIds: ['lv9'],
+  },
+  {
+    id: 'two-digit-easy',
+    number: 5,
+    name: 'やさしい 2けた',
+    description: '2けた±1けた（くりあがり・くりさがりなし）',
+    levelIds: ['lv10', 'lv11'],
+  },
+  {
+    id: 'two-digit-add',
+    number: 6,
+    name: '2けたどうしの たしざん',
+    description: '2けた+2けた',
+    levelIds: ['lv12', 'lv13'],
+  },
+  {
+    id: 'two-digit-sub-3digit',
+    number: 7,
+    name: '2けたの ひきざん・3けた',
+    description: '2けた−2けたと やさしい 3けたの加減',
+    levelIds: ['lv14', 'lv15'],
+  },
+  {
+    id: 'multiply',
+    number: 8,
+    name: 'かけ算 九九',
+    description: 'かけ算の だんから 九九ぜんぶ',
+    levelIds: ['lv16', 'lv17', 'lv18', 'lv19'],
+  },
+]
 
 function animal(name: string, file: string): StageAnimal {
   return { name, image: `stamps/${file}.webp` }
@@ -100,35 +174,40 @@ const STAGE_ANIMALS: StageAnimal[] = [
   animal('カモノハシ', 'platypus'),
 ]
 
-/** 問題数ごとにレベルをわけ、各レベルの中で LEVELS の順にステップアップする */
+/** 各難易度の中で、この問題数の順にステップアップする */
 export const STAGE_COUNTS = [30, 50, 70, 100]
 
 /** このランク以上でクリアすると次のステージがひらく */
 export const UNLOCK_RANK: Rank = 'B'
 
-export const STAGES: Stage[] = STAGE_COUNTS.flatMap((count) => LEVELS.map((level) => ({ level, count }))).map(
-  (s, index) => ({
-    ...s,
-    id: `${s.level.id}-${s.count}`,
-    index,
-    animal: STAGE_ANIMALS[index % STAGE_ANIMALS.length],
+/** テーマ → 難易度 → 問題数 の順（初期の12ステージ構成をステージ1に据える） */
+export const STAGES: Stage[] = THEMES.flatMap((theme) =>
+  theme.levelIds.flatMap((levelId) => {
+    const level = findLevel(levelId)
+    if (!level) throw new Error(`unknown level: ${levelId}`)
+    return STAGE_COUNTS.map((count) => ({ theme, level, count }))
   }),
-)
+).map((s, index) => ({
+  ...s,
+  id: `${s.level.id}-${s.count}`,
+  index,
+  animal: STAGE_ANIMALS[index % STAGE_ANIMALS.length],
+}))
 
 export function findStage(id: string): Stage | undefined {
   return STAGES.find((s) => s.id === id)
 }
 
-export function stageLabel(stage: Stage) {
-  return `ステージ${stage.index + 1}`
+export function themeLabel(theme: Theme) {
+  return `ステージ${theme.number}`
 }
 
-export function levelLabel(count: number) {
-  return `レベル${STAGE_COUNTS.indexOf(count) + 1}`
+export function stageLabel(stage: Stage) {
+  return themeLabel(stage.theme)
 }
 
 export function stageDetail(stage: Stage) {
-  return `${levelLabel(stage.count)}(${stage.count}もん)・${stage.level.name}`
+  return `${stage.level.name}・${stage.count}もん`
 }
 
 export function meetsUnlockRank(rank: Rank) {
