@@ -1,8 +1,10 @@
-import { formatProblem } from '../levels'
+import { useState } from 'react'
+import { formatProblem, type Problem } from '../levels'
 import { calcScore, formatTime, isBetterRank } from '../scoring'
 import { UNLOCK_RANK, getCurrentStage, stageDetail, stageLabel, type Stage } from '../stages'
 import type { PlayRecord } from '../storage'
 import type { AnswerLog } from './Play'
+import { HintPanel } from './Hint'
 import { Stamp } from './Stamp'
 
 type Props = {
@@ -45,6 +47,7 @@ export function Result({
   const current = getCurrentStage()
   const mustRetry = current?.id === stage.id
   const goNext = current && !mustRetry ? current : undefined
+  const [hintProblem, setHintProblem] = useState<Problem | null>(null)
 
   return (
     <div className="screen result">
@@ -118,8 +121,17 @@ export function Result({
           <ul>
             {mistakes.map((m, i) => (
               <li key={i}>
-                {formatProblem(m.problem)} = <b>{m.problem.answer}</b>
-                <span className="mistake-input">({m.input} って こたえたよ)</span>
+                <div className="mistake-main">
+                  {formatProblem(m.problem)} = <b>{m.problem.answer}</b>
+                  <span className="mistake-input">({m.input} って こたえたよ)</span>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-small hint-btn-inline"
+                  onClick={() => setHintProblem(m.problem)}
+                >
+                  ヒント
+                </button>
               </li>
             ))}
           </ul>
@@ -134,6 +146,8 @@ export function Result({
           スタンプを みる
         </button>
       </div>
+
+      {hintProblem && <HintPanel problem={hintProblem} onClose={() => setHintProblem(null)} />}
     </div>
   )
 }

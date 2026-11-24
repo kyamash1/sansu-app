@@ -220,16 +220,21 @@ export function isStageCleared(stage: Stage) {
   return getRecords().some((r) => r.stageId === stage.id && meetsUnlockRank(r.rank))
 }
 
-export type StageStatus = 'cleared' | 'current' | 'locked'
+export type StageStatus = 'cleared' | 'current' | 'unlocked' | 'locked'
 
 /** 先頭から順にみて、最初の未クリアが「いまのステージ」。それより後ろはロック */
 export function getStageStatuses(): StageStatus[] {
+  // 開発時は全ステージ解放（テストしやすくするため）
+  const unlockAll = import.meta.env.DEV
+
   let foundCurrent = false
   return STAGES.map((stage) => {
-    if (foundCurrent) return 'locked'
     if (isStageCleared(stage)) return 'cleared'
-    foundCurrent = true
-    return 'current'
+    if (!foundCurrent) {
+      foundCurrent = true
+      return 'current'
+    }
+    return unlockAll ? 'unlocked' : 'locked'
   })
 }
 

@@ -3,6 +3,7 @@ import { formatProblem, generateProblems, type Problem } from '../levels'
 import { formatClock } from '../scoring'
 import { playCorrect, playWrong } from '../sound'
 import { stageDetail, stageLabel, type Stage } from '../stages'
+import { HintPanel } from './Hint'
 
 export type AnswerLog = {
   problem: Problem
@@ -31,7 +32,10 @@ type PlayState = {
   finishedAt: number | null
 }
 
-type Action = { type: 'start'; now: number } | { type: 'key'; key: string; now: number }
+type Action =
+  | { type: 'start'; now: number }
+  | { type: 'key'; key: string; now: number }
+  | { type: 'unpause'; dt: number }
 
 function submit(state: PlayState, value: string, now: number): PlayState {
   if (value === '') return state
@@ -55,6 +59,14 @@ function submit(state: PlayState, value: string, now: number): PlayState {
 function reducer(state: PlayState, action: Action): PlayState {
   if (action.type === 'start') {
     return state.startedAt === null ? { ...state, startedAt: action.now, shownAt: action.now } : state
+  }
+  if (action.type === 'unpause') {
+    if (state.startedAt === null) return state
+    return {
+      ...state,
+      startedAt: state.startedAt + action.dt,
+      shownAt: state.shownAt + action.dt,
+    }
   }
   if (state.startedAt === null || state.finishedAt !== null) return state
 
@@ -81,12 +93,16 @@ export function Play({ stage, onFinish, onQuit }: Props) {
   }))
   const [countdown, setCountdown] = useState(3)
   const [elapsed, setElapsed] = useState(0)
+  const [hintOpen, setHintOpen] = useState(false)
   const reported = useRef(false)
+  const hintOpenedAt = useRef<number | null>(null)
 
   const { problems, input, answers, startedAt, finishedAt } = state
-  const playing = countdown === 0
+  const started = countdown === 0
+  const canType = started && !hintOpen
   const total = problems.length
   const index = Math.min(answers.length, total - 1)
+  const currentProblem = problems[index]
 
   useEffect(() => {
     if (countdown <= 0) return
@@ -98,10 +114,31 @@ export function Play({ stage, onFinish, onQuit }: Props) {
   }, [countdown])
 
   useEffect(() => {
-    if (startedAt === null || finishedAt !== null) return
+    if (startedAt === null || finishedAt !== null || hintOpen) return
     const t = setInterval(() => setElapsed(performance.now() - startedAt), 200)
     return () => clearInterval(t)
-  }, [startedAt, finishedAt])
+  }, [startedAt, finishedAt, hintOpen])
+
+  // 問題が変わったらヒントを閉じる
+  useEffect(() => {
+    setHintOpen(false)
+    hintOpenedAt.current = null
+  }, [answers.length])
+
+  const openHint = () => {
+    if (countdown > 0 || finishedAt !== null) return
+    hintOpenedAt.current = performance.now()
+    setHintOpen(true)
+  }
+
+  const closeHint = () => {
+    const opened = hintOpenedAt.current
+    if (opened != null) {
+      dispatch({ type: 'unpause', dt: performance.now() - opened })
+      hintOpenedAt.current = null
+    }
+    setHintOpen(false)
+  }
 
   useEffect(() => {
     if (finishedAt === null || startedAt === null || reported.current) return
@@ -119,6 +156,7 @@ export function Play({ stage, onFinish, onQuit }: Props) {
   const press = useCallback((key: string) => dispatch({ type: 'key', key, now: performance.now() }), [])
 
   useEffect(() => {
+    if (hintOpen) return
     const onKey = (e: KeyboardEvent) => {
       if (/^[0-9]$/.test(e.key)) press(e.key)
       else if (e.key === 'Backspace') press('del')
@@ -126,7 +164,7 @@ export function Play({ stage, onFinish, onQuit }: Props) {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [press])
+  }, [press, hintOpen])
 
   const handleQuit = () => {
     if (window.confirm('とちゅうで やめますか?(きろくは のこりません)')) onQuit()
@@ -138,7 +176,7 @@ export function Play({ stage, onFinish, onQuit }: Props) {
   for (let i = from; i <= to; i++) {
     const p = problems[i]
     const log = answers[i]
-    const isCurrent = i === index && playing
+    const isCurrent = i === index && started
     rows.push(
       <div
         key={i}
@@ -199,7 +237,7 @@ export function Play({ stage, onFinish, onQuit }: Props) {
         <div className="sheet-inner" style={{ transform: `translateY(${-index * ROW_HEIGHT}px)` }}>
           {rows}
         </div>
-        {!playing && (
+        {!started && (
           <div className="countdown">
             <div key={countdown} className="countdown-num">
               {countdown}
@@ -215,6 +253,14 @@ export function Play({ stage, onFinish, onQuit }: Props) {
           ✕
         </span>{' '}
         {answers.length - correctCount}
+        <button
+          type="button"
+          className="btn btn-small hint-btn"
+          onClick={openHint}
+          disabled={countdown > 0 || finishedAt !== null}
+        >
+          ヒント
+        </button>
       </div>
 
       <div className="keypad">
@@ -226,12 +272,14 @@ export function Play({ stage, onFinish, onQuit }: Props) {
               e.preventDefault()
               press(k)
             }}
-            disabled={!playing}
+            disabled={!canType}
           >
             {k === 'del' ? 'けす' : k === 'ok' ? 'OK' : k}
           </button>
         ))}
       </div>
+
+      {hintOpen && <HintPanel problem={currentProblem} onClose={closeHint} />}
     </div>
   )
 }

@@ -94,7 +94,7 @@ export function Home({ onStart, onOpenStamps }: Props) {
                 </div>
                 <button
                   className="map-node"
-                  disabled={status === 'locked'}
+                  disabled={!reached}
                   onClick={() => onStart(stage.id)}
                   aria-label={`${stageLabel(stage)} ${stageDetail(stage)}`}
                 >
@@ -107,6 +107,7 @@ export function Home({ onStart, onOpenStamps }: Props) {
                   </div>
                   <div className="map-status">
                     {status === 'current' && <span className="map-here">つぎは ここ!</span>}
+                    {status === 'unlocked' && <span>テスト開放</span>}
                     {status === 'cleared' && best && `ベスト ${formatTime(best.timeMs)}`}
                     {status === 'locked' && stageLabel(stage)}
                   </div>
