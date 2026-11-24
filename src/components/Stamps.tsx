@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { LEVELS, findLevel } from '../levels'
 import { RANKS, formatTime, rankCriteria } from '../scoring'
 import { STAGES, UNLOCK_RANK, findStage, stageDetail } from '../stages'
@@ -20,9 +20,14 @@ function formatDate(ts: number) {
 export function Stamps({ initialLevelId, onBack }: Props) {
   const [levelId, setLevelId] = useState(initialLevelId)
   const [, setVersion] = useState(0)
+  const activeTabRef = useRef<HTMLButtonElement>(null)
   const level = findLevel(levelId) ?? LEVELS[0]
   const records = getRecords({ levelId: level.id })
   const counts = countStamps(level.id)
+
+  useEffect(() => {
+    activeTabRef.current?.scrollIntoView({ inline: 'center', block: 'nearest', behavior: 'smooth' })
+  }, [levelId])
 
   // スタンプカードは20こで1まい。いっぱいになったら つぎのカードへ
   const slotCount = Math.max(CARD_SLOTS, Math.ceil((records.length + 1) / CARD_SLOTS) * CARD_SLOTS)
@@ -71,6 +76,7 @@ export function Stamps({ initialLevelId, onBack }: Props) {
         {LEVELS.map((l) => (
           <button
             key={l.id}
+            ref={l.id === level.id ? activeTabRef : undefined}
             className={`tab ${l.id === level.id ? 'tab-active' : ''}`}
             onClick={() => setLevelId(l.id)}
           >
@@ -114,7 +120,7 @@ export function Stamps({ initialLevelId, onBack }: Props) {
         <summary>ランクの きじゅん(おうちの かたへ)</summary>
         <p>
           正答率とタイムをそれぞれ評価し、低いほうのランクになります。
-          ステージは大きなテーマごとに分かれ、その中で問題の種類と問題数（30・50・70・100問）が進みます。
+          ステージは大きなテーマごとに分かれ、その中で問題数（30・50・70・100問）の塊ごとに進みます。
           {UNLOCK_RANK} 以上でクリアすると次が解放されます。
         </p>
         <table>

@@ -180,13 +180,15 @@ export const STAGE_COUNTS = [30, 50, 70, 100]
 /** このランク以上でクリアすると次のステージがひらく */
 export const UNLOCK_RANK: Rank = 'B'
 
-/** テーマ → 難易度 → 問題数 の順（初期の12ステージ構成をステージ1に据える） */
+/** テーマ → 問題数（30〜100の塊） → 難易度 の順 */
 export const STAGES: Stage[] = THEMES.flatMap((theme) =>
-  theme.levelIds.flatMap((levelId) => {
-    const level = findLevel(levelId)
-    if (!level) throw new Error(`unknown level: ${levelId}`)
-    return STAGE_COUNTS.map((count) => ({ theme, level, count }))
-  }),
+  STAGE_COUNTS.flatMap((count) =>
+    theme.levelIds.map((levelId) => {
+      const level = findLevel(levelId)
+      if (!level) throw new Error(`unknown level: ${levelId}`)
+      return { theme, level, count }
+    }),
+  ),
 ).map((s, index) => ({
   ...s,
   id: `${s.level.id}-${s.count}`,
