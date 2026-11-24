@@ -1,4 +1,10 @@
-export type Operator = '+' | '-'
+export type Operator = '+' | '-' | '×'
+
+function computeAnswer(a: number, b: number, operator: Operator): number {
+  if (operator === '+') return a + b
+  if (operator === '-') return a - b
+  return a * b
+}
 
 export type Problem = {
   a: number
@@ -168,6 +174,15 @@ function simple3digitCandidates(): Candidate[] {
   return result
 }
 
+/** かけ算九九: 指定した段 × 1〜9 */
+function mulPairs(dans: number[]): [number, number][] {
+  const result: [number, number][] = []
+  for (const a of dans) {
+    for (const b of DIGITS) result.push([a, b])
+  }
+  return result
+}
+
 export const LEVELS: Level[] = [
   {
     id: 'lv1',
@@ -291,6 +306,38 @@ export const LEVELS: Level[] = [
     pairs: [],
     candidates: simple3digitCandidates(),
   },
+  {
+    id: 'lv16',
+    name: 'かけ算 1のだん',
+    description: '1のだんの かけ算',
+    targetSecPerProblem: 2.5,
+    operator: '×',
+    pairs: mulPairs([1]),
+  },
+  {
+    id: 'lv17',
+    name: 'かけ算 2〜5のだん',
+    description: '2のだんから 5のだんの かけ算',
+    targetSecPerProblem: 3.0,
+    operator: '×',
+    pairs: mulPairs([2, 3, 4, 5]),
+  },
+  {
+    id: 'lv18',
+    name: 'かけ算 6〜9のだん',
+    description: '6のだんから 9のだんの かけ算',
+    targetSecPerProblem: 3.5,
+    operator: '×',
+    pairs: mulPairs([6, 7, 8, 9]),
+  },
+  {
+    id: 'lv19',
+    name: 'かけ算 九九ぜんぶ',
+    description: '1けた×1けたの かけ算 ぜんぶ',
+    targetSecPerProblem: 2.5,
+    operator: '×',
+    pairs: mulPairs(DIGITS),
+  },
 ]
 
 export function findLevel(id: string): Level | undefined {
@@ -351,12 +398,7 @@ export function generateProblems(level: Level, count: number): Problem[] {
       }
       for (const { a, b, operator } of batch) {
         if (out.length >= count) break
-        out.push({
-          a,
-          b,
-          operator,
-          answer: operator === '+' ? a + b : a - b,
-        })
+        out.push({ a, b, operator, answer: computeAnswer(a, b, operator) })
       }
     }
     return out
@@ -374,7 +416,7 @@ export function generateProblems(level: Level, count: number): Problem[] {
         a,
         b,
         operator: level.operator,
-        answer: level.operator === '+' ? a + b : a - b,
+        answer: computeAnswer(a, b, level.operator),
       })
     }
   }
