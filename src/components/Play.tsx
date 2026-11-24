@@ -20,7 +20,7 @@ type Props = {
 const ROW_HEIGHT = 104
 const ROWS_BEFORE = 5
 const ROWS_AFTER = 5
-const MAX_INPUT_LENGTH = 3
+const MAX_INPUT_LENGTH = 4
 
 type PlayState = {
   problems: Problem[]

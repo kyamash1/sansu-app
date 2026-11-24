@@ -9,6 +9,12 @@ export type Problem = {
   answer: number
 }
 
+export type Candidate = {
+  a: number
+  b: number
+  operator: Operator
+}
+
 export type Level = {
   id: string
   name: string
@@ -16,10 +22,12 @@ export type Level = {
   /** 1問あたりの目標秒数。これ以内ならスピード面で S 判定 */
   targetSecPerProblem: number
   operator: Operator
-  /** 出題候補となる (a, b)。triples がある場合は使わない */
+  /** 出題候補となる (a, b)。triples / candidates がある場合は使わない */
   pairs: [number, number][]
   /** 3つのかずのたしざん用。あればこちらを優先 */
   triples?: [number, number, number][]
+  /** 加減混在など、演算込みの候補。あれば pairs より優先（triples の次） */
+  candidates?: Candidate[]
 }
 
 const DIGITS = [1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -113,6 +121,48 @@ function add2digit2digitCarry(): [number, number][] {
   for (const a of TWO_DIGIT) {
     for (const b of TWO_DIGIT) {
       if (a % 10 + (b % 10) >= 10) result.push([a, b])
+    }
+  }
+  return result
+}
+
+/** 2けた−2けた（一の位でくりさがりあり、a>b） */
+function sub2digit2digitBorrow(): [number, number][] {
+  const result: [number, number][] = []
+  for (const a of TWO_DIGIT) {
+    for (const b of TWO_DIGIT) {
+      if (a > b && a % 10 < b % 10) result.push([a, b])
+    }
+  }
+  return result
+}
+
+/**
+ * やさしい 3けたの加減（十・百を単位にした簡単な場合）
+ * 例: 200+30 / 400+200 / 350−50 / 500−100
+ */
+function simple3digitCandidates(): Candidate[] {
+  const hundreds = [100, 200, 300, 400, 500, 600, 700, 800, 900]
+  const tens = [10, 20, 30, 40, 50, 60, 70, 80, 90]
+  const round3: number[] = []
+  for (let n = 110; n <= 990; n += 10) round3.push(n)
+
+  const result: Candidate[] = []
+  for (const a of hundreds) {
+    for (const b of tens) {
+      result.push({ a, b, operator: '+' })
+      result.push({ a, b, operator: '-' })
+    }
+    for (const b of hundreds) {
+      result.push({ a, b, operator: '+' })
+      if (a > b) result.push({ a, b, operator: '-' })
+    }
+  }
+  for (const a of round3) {
+    for (const b of tens) {
+      // 一の位がどちらも0なので、十の位だけの加減になる
+      result.push({ a, b, operator: '+' })
+      if (a > b) result.push({ a, b, operator: '-' })
     }
   }
   return result
@@ -224,6 +274,23 @@ export const LEVELS: Level[] = [
     operator: '+',
     pairs: add2digit2digitCarry(),
   },
+  {
+    id: 'lv14',
+    name: '2けた−2けた',
+    description: 'くりさがりのある 2けたどうしの ひきざん',
+    targetSecPerProblem: 6.0,
+    operator: '-',
+    pairs: sub2digit2digitBorrow(),
+  },
+  {
+    id: 'lv15',
+    name: 'やさしい 3けたの加減',
+    description: '百や 十を たんいにした かんたんな 加減',
+    targetSecPerProblem: 5.5,
+    operator: '+',
+    pairs: [],
+    candidates: simple3digitCandidates(),
+  },
 ]
 
 export function findLevel(id: string): Level | undefined {
@@ -252,6 +319,10 @@ function sameTriple(x: [number, number, number], a: number, b: number, c: number
   return x[0] === a && x[1] === b && x[2] === c
 }
 
+function sameCandidate(x: Candidate, last: Problem) {
+  return x.a === last.a && x.b === last.b && x.operator === last.operator
+}
+
 /** 候補をシャッフルしたものを繰り返し並べ、同じ問題が連続しないように count 問つくる */
 export function generateProblems(level: Level, count: number): Problem[] {
   const out: Problem[] = []
@@ -266,6 +337,26 @@ export function generateProblems(level: Level, count: number): Problem[] {
       for (const [a, b, c] of batch) {
         if (out.length >= count) break
         out.push({ a, b, c, operator: '+', answer: a + b + c })
+      }
+    }
+    return out
+  }
+
+  if (level.candidates && level.candidates.length > 0) {
+    while (out.length < count) {
+      const batch = shuffle(level.candidates)
+      const last = out[out.length - 1]
+      if (last && batch.length > 1 && sameCandidate(batch[0], last)) {
+        ;[batch[0], batch[1]] = [batch[1], batch[0]]
+      }
+      for (const { a, b, operator } of batch) {
+        if (out.length >= count) break
+        out.push({
+          a,
+          b,
+          operator,
+          answer: operator === '+' ? a + b : a - b,
+        })
       }
     }
     return out

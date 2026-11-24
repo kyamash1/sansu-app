@@ -541,7 +541,7 @@ button {
   left: 0;
   right: 0;
   display: grid;
-  grid-template-columns: 64px minmax(140px, auto) 130px 80px;
+  grid-template-columns: 64px minmax(160px, auto) 150px 80px;
   justify-content: center;
   align-items: center;
   gap: 12px;
