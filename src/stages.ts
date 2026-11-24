@@ -34,6 +34,14 @@ const STAGE_ANIMALS: StageAnimal[] = [
   animal('イリエワニ', 'crocodile'),
   animal('オオアナコンダ', 'anaconda'),
   animal('アフリカゾウ', 'elephant'),
+  animal('プテラノドン', 'pteranodon'),
+  animal('ステゴサウルス', 'stegosaurus'),
+  animal('トラ', 'tiger'),
+  animal('オオカミ', 'wolf'),
+  animal('チーター', 'cheetah'),
+  animal('シャチ', 'orca'),
+  animal('オオワシ', 'eagle'),
+  animal('カバ', 'hippo'),
 ]
 
 /** 問題数ごとにレベルをわけ、各レベルの中で LEVELS の順にステップアップする */

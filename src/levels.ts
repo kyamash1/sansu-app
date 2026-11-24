@@ -48,6 +48,20 @@ export const LEVELS: Level[] = [
     targetSecPerProblem: 3.0,
     pairs: pairsWhere((a, b) => a + b <= 10),
   },
+  {
+    id: 'lv4',
+    name: 'くりあがり たしざん',
+    description: 'くりあがりのある たしざん',
+    targetSecPerProblem: 3.5,
+    pairs: pairsWhere((a, b) => a + b >= 11),
+  },
+  {
+    id: 'lv5',
+    name: 'たしざん ぜんぶ',
+    description: '1けたどうしの たしざん ぜんぶ',
+    targetSecPerProblem: 3.0,
+    pairs: pairsWhere(() => true),
+  },
 ]
 
 export function findLevel(id: string): Level | undefined {
