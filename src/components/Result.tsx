@@ -1,3 +1,4 @@
+import { formatProblem } from '../levels'
 import { calcScore, formatTime, isBetterRank } from '../scoring'
 import { UNLOCK_RANK, getCurrentStage, stageDetail, stageLabel, type Stage } from '../stages'
 import type { PlayRecord } from '../storage'
@@ -115,7 +116,7 @@ export function Result({
           <ul>
             {mistakes.map((m, i) => (
               <li key={i}>
-                {m.problem.a} + {m.problem.b} = <b>{m.problem.answer}</b>
+                {formatProblem(m.problem)} = <b>{m.problem.answer}</b>
                 <span className="mistake-input">({m.input} って こたえたよ)</span>
               </li>
             ))}

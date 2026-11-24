@@ -23,7 +23,7 @@ export function Home({ onStart, onOpenStamps }: Props) {
   return (
     <div className="screen home">
       <header className="home-header">
-        <h1>たしざん れんしゅう</h1>
+        <h1>さんすう れんしゅう</h1>
         <div className="map-progress">
           <div className="map-progress-bar">
             <div

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
-import { generateProblems, type Problem } from '../levels'
+import { formatProblem, generateProblems, type Problem } from '../levels'
 import { formatClock } from '../scoring'
 import { playCorrect, playWrong } from '../sound'
 import { stageDetail, stageLabel, type Stage } from '../stages'
@@ -148,8 +148,8 @@ export function Play({ stage, onFinish, onQuit }: Props) {
         style={{ top: i * ROW_HEIGHT, height: ROW_HEIGHT }}
       >
         <span className="row-no">({i + 1})</span>
-        <span className="row-expr">
-          {p.a} + {p.b} =
+        <span className={`row-expr ${p.c != null ? 'row-expr-wide' : ''}`}>
+          {formatProblem(p)} =
         </span>
         <span className={`row-answer ${isCurrent ? 'row-answer-active' : ''}`}>
           {log ? log.input : isCurrent ? input : ''}
